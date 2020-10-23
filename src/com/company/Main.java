@@ -12,17 +12,30 @@ public class Main {
 
         File file = new File(filePath);
 
-        GodzillaReader fileReader = new GodzillaReader(file.getAbsolutePath());
+        Reader fileReader = new Reader(file.getAbsolutePath());
 
         List<String[]> arrayList = fileReader.readFile();
 
-        GodzillaParser godzillaParser = new GodzillaParser(arrayList);
+        Parser parser = new Parser(arrayList);
 
-        godzillaParser.printDeaths();
+        ParsedData parsedData = parser.calculateAllDeaths();
+        Integer allDeaths = parsedData.getAllDeaths();
+        System.out.println("Deaths count is :" + allDeaths);
 
-        System.out.println(fileReader.getFilePath());
-        fileReader.setFilePath(".");
-        fileReader.readFile();
+        Downloader downloader = new Downloader();
+        downloader.downloadFile();
+
+
+
+
+
+
+
+
+
+
+
+
 
     }
 }

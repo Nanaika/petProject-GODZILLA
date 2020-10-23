@@ -8,11 +8,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 
-public class GodzillaReader {
+public class Reader {
 
     private String filePath;
 
-    GodzillaReader(String path) {
+    Reader(String path) {
         this.filePath = path;
     }
 
@@ -43,7 +43,8 @@ public class GodzillaReader {
                     "Check file path" +
                     " or change file path to valid!");
         } catch (IOException e) {
-            System.out.println("Something go wrong!");
+            System.out.println("Something go wrong!" +
+                    "Check folder or disk access.");
 
         } catch (CsvException e) {
             System.out.println("CSV exception!");

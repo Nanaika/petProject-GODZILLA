@@ -1,21 +1,28 @@
 package com.company;
 
+import java.sql.SQLOutput;
 import java.util.List;
 
-public class GodzillaParser {
+public class Parser {
 
 
-    List<String[]> stringData;
+    private List<String[]> stringData;
 
-    GodzillaParser(List<String[]> stringData) {
+    Parser(List<String[]> stringData) {
         this.stringData = stringData;
     }
 
-    public void printDeaths() {
+    public void setData(List<String[]> array) {
+        this.stringData = array;
+    }
+
+
+    public ParsedData calculateAllDeaths() {
 
         String[] heading = stringData.get(0);
         int index = 0;
         int deaths = 0;
+
 
         for (int i = 0; i < heading.length; i++) {
 
@@ -25,6 +32,7 @@ public class GodzillaParser {
 
         }
 
+
         for (int x = 1; x < stringData.size(); x++) {
 
             String temp = stringData.get(x)[index];
@@ -32,7 +40,10 @@ public class GodzillaParser {
             deaths += Integer.parseInt(temp);
         }
 
-        System.out.println(deaths);
+        ParsedData parsedData = new ParsedData();
+        parsedData.setAllDeaths(deaths);
+        return parsedData;
+
     }
 
 
