@@ -10,9 +10,8 @@ import java.net.URL;
 
 public class Downloader {
 
-    String fileUrl = "https://yournewstyle.pl/csv";
-    String saveDir = "E:\\NewDir\\";
-
+    private String fileUrl = "";
+    private String saveDir = "";
 
 
     public void setFileUrl(String url) {
@@ -47,6 +46,7 @@ public class Downloader {
         HttpURLConnection httpCon = null;
         try {
 
+            assert url != null;
             httpCon = (HttpURLConnection) url.openConnection();
 
         } catch (IOException e) {
@@ -56,7 +56,9 @@ public class Downloader {
         }
 
 
-        try (InputStream is = httpCon.getInputStream(); FileOutputStream fos = new FileOutputStream(saveFilePath)) {
+        assert httpCon != null;
+        try (InputStream is = httpCon.getInputStream();
+             FileOutputStream fos = new FileOutputStream(saveFilePath)) {
 
             int bytesRead;
             byte[] buffer = new byte[10485760];
@@ -71,7 +73,7 @@ public class Downloader {
 
         } catch (IOException e) {
 
-            System.out.println("I/O exception!");
+            System.out.println("Check disc access!");
 
         }
 

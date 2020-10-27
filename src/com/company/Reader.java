@@ -25,7 +25,7 @@ public class Reader {
         return this.filePath;
     }
 
-    public List<String[]> readFile () {
+    public List<String[]> readFile() {
 
         List<String[]> arrayList = null;
 
@@ -33,8 +33,6 @@ public class Reader {
 
 
             arrayList = csvReader.readAll();
-
-
 
 
         } catch (FileNotFoundException e) {
