@@ -1,6 +1,9 @@
 package com.company;
 
+import com.opencsv.CSVParser;
+import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvException;
 
 import java.io.FileNotFoundException;
@@ -10,30 +13,40 @@ import java.util.List;
 
 public class Reader {
 
+    private String separator;
     private String filePath;
 
-    Reader(String path) {
+    Reader(String path, String separator) {
         this.filePath = path;
+        this.separator = separator;
     }
 
-
-    public void setFilePath(String path) {
-        this.filePath = path;
-    }
-
-    public String getFilePath() {
-        return this.filePath;
-    }
 
     public List<String[]> readFile() {
 
         List<String[]> arrayList = null;
 
-        try (CSVReader csvReader = new CSVReader(new FileReader(filePath))) {
+        try {
+
+
+            char sep = separator.charAt(0);
+
+
+            CSVParserBuilder csvParser = new CSVParserBuilder();
+            csvParser.withSeparator(sep);
+
+            CSVParser csvParser1 = csvParser.build();
+
+            CSVReaderBuilder csvReaderBuilder = new CSVReaderBuilder(new FileReader(filePath));
+
+            csvReaderBuilder.withCSVParser(csvParser1);
+
+            CSVReader csvReader = csvReaderBuilder.build();
 
 
             arrayList = csvReader.readAll();
 
+            csvReader.close();
 
         } catch (FileNotFoundException e) {
             System.out.println("Sorry!" +

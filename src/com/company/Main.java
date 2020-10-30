@@ -4,40 +4,41 @@ package com.company;
 import org.apache.commons.cli.*;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.Properties;
 
 public class Main {
 
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
         System.out.println("Welcome to GODZILLA.\n");
 
 
-        Properties prop = new Properties();
-        prop.load(new FileInputStream(new File("./src/config.ini")));
+//        Properties prop = new Properties();
+//        prop.load(new FileInputStream(new File("./src/config.ini")));
 
         Options options = new Options();
 
 
         Option parseOpt = new Option("p", "parse", true, "parse csv file");
-        parseOpt.setRequired(false);
+        parseOpt.setArgs(2);
+        parseOpt.setArgName("1st arg : path to file, 2nd arg : separator");
+        parseOpt.setValueSeparator(' ');
+        parseOpt.setOptionalArg(true);
         options.addOption(parseOpt);
 
         Option downloadOpt = new Option("d", "download", true, "download csv file");
 
         downloadOpt.setArgs(2);
+        downloadOpt.setArgName("1st arg : download path, 2nd arg : save folder path");
         downloadOpt.setValueSeparator(' ');
-
-        downloadOpt.setRequired(false);
         options.addOption(downloadOpt);
 
         Option backupOpt = new Option("b", "backup", true, "backup parsed data to file");
         backupOpt.setRequired(false);
+        backupOpt.setArgName("path to save folder");
+        backupOpt.setOptionalArg(true);
         options.addOption(backupOpt);
 
 
@@ -52,7 +53,8 @@ public class Main {
             cmd = clparser.parse(options, args);
         } catch (ParseException e) {
             System.out.println(e.getMessage());
-            formatter.printHelp("utility-name", options);
+            formatter.printHelp(150,"utility-name",
+                    "======",options,"======");
 
             System.exit(1);
         }
@@ -71,23 +73,51 @@ public class Main {
         }
         if (cmd.hasOption("p")) {
 
-            Reader reader = new Reader(cmd.getOptionValue("p"));
-            List<String[]> data = reader.readFile();
+            if (cmd.hasOption("d")) {
 
-            Parser parser = new Parser(data);
-            ParsedData parsedData = parser.calculateAllDeaths();
-            System.out.println("File parsed\n");
-            System.err.println("Deaths count is : " + parsedData.getAllDeaths() + "\n");
+                String[] valuesDown = cmd.getOptionValues("d");
+                String[] valuesPars = cmd.getOptionValues("p");
+
+                String name = valuesDown[0].substring(valuesDown[0].lastIndexOf("/") + 1);
+                String path = valuesDown[1] + File.separator + name;
+
+
+                Reader reader = new Reader(path,valuesPars[0]);
+                List<String[]> data = reader.readFile();
+
+                Parser parser = new Parser(data);
+                ParsedData parsedData = parser.calculateAllDeaths();
+                System.out.println("File parsed\n");
+                System.err.println("Deaths count is : " + parsedData.getAllDeaths() + "\n");
+
+
+            } else {
+
+                String[] valuesPars = cmd.getOptionValues("p");
+
+                Reader reader = new Reader(valuesPars[0], valuesPars[1]);
+                List<String[]> data = reader.readFile();
+
+                Parser parser = new Parser(data);
+                ParsedData parsedData = parser.calculateAllDeaths();
+                System.out.println("File parsed\n");
+                System.err.println("Deaths count is : " + parsedData.getAllDeaths() + "\n");
+            }
+
+
+
 
         }
         if (cmd.hasOption("b")) {
-            if (!(cmd.hasOption("p"))){
+            if (!(cmd.hasOption("p"))) {
 
                 System.out.println("Cant backup data without parsing file!");
 
-            }else {
+            } else {
 
-                Reader reader = new Reader(cmd.getOptionValue("p"));
+                String[] valuesPars = cmd.getOptionValues("p");
+
+                Reader reader = new Reader(valuesPars[0], valuesPars[1]);
                 List<String[]> data = reader.readFile();
 
                 Parser parser = new Parser(data);
@@ -102,7 +132,9 @@ public class Main {
 
             System.err.println("     Possible commands : ");
             PrintWriter pw = new PrintWriter(System.err);
-            formatter.printOptions(pw, 100, options, 10, 5);
+            formatter.printOptions(pw, 150, options, 5, 10);
+
+
             pw.flush();
             pw.close();
 

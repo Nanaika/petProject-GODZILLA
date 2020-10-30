@@ -9,6 +9,7 @@ public class Parser {
 
     Parser(List<String[]> stringData) {
         this.stringData = stringData;
+
     }
 
     public void setData(List<String[]> array) {
@@ -19,14 +20,29 @@ public class Parser {
     public ParsedData calculateAllDeaths() {
 
         String[] heading = stringData.get(0);
+
+
         int index = 0;
         int deaths = 0;
 
 
         for (int i = 0; i < heading.length; i++) {
 
-            if (heading[i].equals("deaths")) {
+            if (heading[i].equalsIgnoreCase("deaths") ||
+                    heading[i].equalsIgnoreCase("death")) {
                 index = i;
+            }
+
+        }
+
+        if (!(heading[index].equalsIgnoreCase("deaths"))
+        ) {
+            if (!(heading[index].equalsIgnoreCase("death"))) {
+
+                System.out.println("Keyword death or deaths not found.\n" +
+                        "Check file.");
+
+                System.exit(1);
             }
 
         }

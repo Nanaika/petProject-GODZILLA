@@ -64,6 +64,7 @@ public class Downloader {
             byte[] buffer = new byte[10485760];
             while ((bytesRead = is.read(buffer)) != -1) {
                 fos.write(buffer, 0, bytesRead);
+                fos.flush();
             }
 
             System.out.println("File downloaded.");
