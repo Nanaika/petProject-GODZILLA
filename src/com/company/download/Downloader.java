@@ -1,4 +1,4 @@
-package com.company;
+package com.company.download;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -12,6 +12,14 @@ public class Downloader {
 
     private String fileUrl = "";
     private String saveDir = "";
+    private String fileName;
+    private String saveFilePath;
+
+
+    public String getFileName() {
+        return fileName;
+    }
+
 
 
     public void setFileUrl(String url) {
@@ -23,14 +31,14 @@ public class Downloader {
     }
 
     public String getSaveDir() {
-        return saveDir;
+        return this.saveDir;
     }
 
     public void downloadFile() {
 
 
-        String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
-        String saveFilePath = saveDir + File.separator + fileName;
+         fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+         saveFilePath = saveDir + File.separator + fileName;
 
 
         URL url = null;
@@ -61,20 +69,21 @@ public class Downloader {
              FileOutputStream fos = new FileOutputStream(saveFilePath)) {
 
             int bytesRead;
-            byte[] buffer = new byte[10485760];
+            byte[] buffer = new byte[20485760];
             while ((bytesRead = is.read(buffer)) != -1) {
                 fos.write(buffer, 0, bytesRead);
                 fos.flush();
             }
 
-            System.out.println("File downloaded.");
-//        while (is.read() != -1) {
-//                fos.write(is.read());
-//        }
+            System.out.println("File downloaded.\n");
 
         } catch (IOException e) {
-
-            System.out.println("Check disc access!");
+            System.out.println("Failed to download file!\n" +
+                    "===========\n" +
+                    "Possible problems\n" +
+                    "1.File not available for download!" +
+                    "Check url!\n" +
+                    "2.Check folder or disk access!\n");
 
         }
 

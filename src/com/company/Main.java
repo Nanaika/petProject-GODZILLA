@@ -1,10 +1,12 @@
 package com.company;
 
-
+import com.company.download.Downloader;
+import com.company.parse.ParsedData;
+import com.company.parse.Parser;
+import com.company.read.Reader;
 import org.apache.commons.cli.*;
 
-import java.io.File;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.List;
 
 public class Main {
@@ -15,36 +17,32 @@ public class Main {
         System.out.println("Welcome to GODZILLA.\n");
 
 
-//        Properties prop = new Properties();
-//        prop.load(new FileInputStream(new File("./src/config.ini")));
-
         Options options = new Options();
 
 
-        Option parseOpt = new Option("p", "parse", true, "parse csv file");
-        parseOpt.setArgs(2);
-        parseOpt.setArgName("1st arg : path to file, 2nd arg : separator");
-        parseOpt.setValueSeparator(' ');
-        parseOpt.setOptionalArg(true);
-        options.addOption(parseOpt);
+        Option parse = new Option("p", "parse", true, "parse csv file");
+        parse.setOptionalArg(true);
+        parse.setArgName("path to file");
+        options.addOption(parse);
 
-        Option downloadOpt = new Option("d", "download", true, "download csv file");
+        Option download = new Option("d", "download", true, "download csv file");
+        download.setArgName("download path");
+        options.addOption(download);
 
-        downloadOpt.setArgs(2);
-        downloadOpt.setArgName("1st arg : download path, 2nd arg : save folder path");
-        downloadOpt.setValueSeparator(' ');
-        options.addOption(downloadOpt);
+        Option backup = new Option("b", "backup", true, "backup parsed data to file");
+        backup.setArgName("path to save folder");
+        options.addOption(backup);
 
-        Option backupOpt = new Option("b", "backup", true, "backup parsed data to file");
-        backupOpt.setRequired(false);
-        backupOpt.setArgName("path to save folder");
-        backupOpt.setOptionalArg(true);
-        options.addOption(backupOpt);
+        Option output = new Option("o", "output", true, "path to save downloaded file");
+        output.setArgName("path to save the file");
+        options.addOption(output);
 
+        Option separator = new Option("sep", "separator", true, "defines a separator for working with a file");
+        separator.setArgName("separator for file");
+        options.addOption(separator);
 
         CommandLineParser clparser = new DefaultParser();
 
-        HelpFormatter formatter = new HelpFormatter();
 
         CommandLine cmd = null;
 
@@ -53,143 +51,208 @@ public class Main {
             cmd = clparser.parse(options, args);
         } catch (ParseException e) {
             System.out.println(e.getMessage());
-            formatter.printHelp(150,"utility-name",
-                    "======",options,"======");
+            File help = new File("./HELP.txt");
+            try {
+                FileInputStream fis = new FileInputStream(help.getPath());
+                byte[] helpBuffer = new byte[8000];
+                while (fis.read() != -1) {
+                    helpBuffer = fis.readAllBytes();
+                }
 
-            System.exit(1);
+                for (byte a : helpBuffer
+                ) {
+                    System.out.print((char) a);
+                }
+
+                System.out.println("\n");
+                fis.close();
+
+            } catch (FileNotFoundException ex) {
+                System.out.println("Help file not found.");
+            } catch (IOException ex) {
+                System.out.println("IO exception!");
+            }
+
+            System.exit(0);
         }
 
 
         if (cmd.hasOption("d")) {
+            if (cmd.hasOption("o")) {
+                if (cmd.hasOption("p")) {
+                    if (cmd.hasOption("sep") || !(cmd.hasOption("sep"))) {
+                        if (cmd.hasOption("b")) {
+                            Downloader downloader = new Downloader();
 
-            Downloader downloader = new Downloader();
+                            downloader.setFileUrl(cmd.getOptionValue("d"));
+                            downloader.setSaveDir(cmd.getOptionValue("o"));
+                            downloader.downloadFile();
 
-            String[] values = cmd.getOptionValues("d");
+                            String filename = downloader.getFileName();
 
-            downloader.setFileUrl(values[0]);
-            downloader.setSaveDir(values[1]);
-            downloader.downloadFile();
+                            String path = cmd.getOptionValue("o");
+                            String sep = cmd.getOptionValue("sep");
 
-        }
-        if (cmd.hasOption("p")) {
+                            Reader reader = new Reader();
+                            reader.setFilePath(path + File.separator + filename);
+                            reader.setSeparator(sep);
+                            List<String[]> data = reader.readFile();
 
-            if (cmd.hasOption("d")) {
+                            Parser parser = new Parser(data);
+                            ParsedData parsedData = parser.calculateAllDeaths();
+                            System.out.println("File parsed\n");
+                            System.out.println("Count is : " + parsedData.getAllDeaths() + "\n");
 
-                String[] valuesDown = cmd.getOptionValues("d");
-                String[] valuesPars = cmd.getOptionValues("p");
+                            parsedData.setBackupPath(cmd.getOptionValue("b"));
 
-                String name = valuesDown[0].substring(valuesDown[0].lastIndexOf("/") + 1);
-                String path = valuesDown[1] + File.separator + name;
+                            parsedData.backupData();
+                            System.out.println("Data backuped!");
+                        } else {
+                            Downloader downloader = new Downloader();
+
+                            downloader.setFileUrl(cmd.getOptionValue("d"));
+                            downloader.setSaveDir(cmd.getOptionValue("o"));
+                            downloader.downloadFile();
+
+                            String filename = downloader.getFileName();
+
+                            String path = cmd.getOptionValue("o");
+                            String sep = cmd.getOptionValue("sep");
+
+                            Reader reader = new Reader();
+                            reader.setFilePath(path + File.separator + filename);
+                            reader.setSeparator(sep);
+                            List<String[]> data = reader.readFile();
+
+                            Parser parser = new Parser(data);
+                            ParsedData parsedData = parser.calculateAllDeaths();
+                            System.out.println("File parsed\n");
+                            System.out.println("Count is : " + parsedData.getAllDeaths() + "\n");
+                        }
+                    } else {
+                        Downloader downloader = new Downloader();
+
+                        downloader.setFileUrl(cmd.getOptionValue("d"));
+                        downloader.setSaveDir(cmd.getOptionValue("o"));
+                        downloader.downloadFile();
+
+                        String filename = downloader.getFileName();
+
+                        String path = cmd.getOptionValue("o");
+
+                        Reader reader = new Reader();
+                        reader.setFilePath(path + File.separator + filename);
+                        List<String[]> data = reader.readFile();
+
+                        Parser parser = new Parser(data);
+                        ParsedData parsedData = parser.calculateAllDeaths();
+                        System.out.println("File parsed\n");
+                        System.out.println("Count is : " + parsedData.getAllDeaths() + "\n");
+                    }
+                } else {
+                    Downloader downloader = new Downloader();
+
+                    downloader.setFileUrl(cmd.getOptionValue("d"));
+                    downloader.setSaveDir(cmd.getOptionValue("o"));
+                    downloader.downloadFile();
+                }
+            } else {
+                System.out.println("Enter command -o for output path");
+            }
+        } else if (cmd.hasOption("p")) {
+            if (cmd.hasOption("sep") || !(cmd.hasOption("sep"))) {
+                if (cmd.hasOption("b")) {
+                    String path = cmd.getOptionValue("p");
+                    String sep = cmd.getOptionValue("sep");
+
+                    if (cmd.getOptionValue("p") == null) {
+
+                        System.out.println("Enter path to file for command -p!");
+                        System.exit(0);
+                    }
+
+                    Reader reader = new Reader();
+                    reader.setFilePath(path);
+                    reader.setSeparator(sep);
+                    List<String[]> data = reader.readFile();
+
+                    Parser parser = new Parser(data);
+                    ParsedData parsedData = parser.calculateAllDeaths();
+                    System.out.println("File parsed\n");
+                    System.out.println("Count is : " + parsedData.getAllDeaths() + "\n");
+                    parsedData.setBackupPath(cmd.getOptionValue("b"));
+
+                    parsedData.backupData();
+                    System.out.println("Data backuped!");
+                } else {
+                    String path = cmd.getOptionValue("p");
+                    String sep = cmd.getOptionValue("sep");
+
+                    if (cmd.getOptionValue("p") == null) {
+
+                        System.out.println("Enter path to file for command -p!");
+                        System.exit(0);
+                    }
 
 
-                Reader reader = new Reader(path,valuesPars[0]);
+                    Reader reader = new Reader();
+                    reader.setFilePath(path);
+                    reader.setSeparator(sep);
+                    List<String[]> data = reader.readFile();
+
+                    Parser parser = new Parser(data);
+                    ParsedData parsedData = parser.calculateAllDeaths();
+                    System.out.println("File parsed\n");
+                    System.out.println("Count is : " + parsedData.getAllDeaths() + "\n");
+
+                }
+            } else {
+                String path = cmd.getOptionValue("p");
+
+                Reader reader = new Reader();
+                reader.setFilePath(path);
                 List<String[]> data = reader.readFile();
 
                 Parser parser = new Parser(data);
                 ParsedData parsedData = parser.calculateAllDeaths();
                 System.out.println("File parsed\n");
-                System.err.println("Deaths count is : " + parsedData.getAllDeaths() + "\n");
-
-
-            } else {
-
-                String[] valuesPars = cmd.getOptionValues("p");
-
-                Reader reader = new Reader(valuesPars[0], valuesPars[1]);
-                List<String[]> data = reader.readFile();
-
-                Parser parser = new Parser(data);
-                ParsedData parsedData = parser.calculateAllDeaths();
-                System.out.println("File parsed\n");
-                System.err.println("Deaths count is : " + parsedData.getAllDeaths() + "\n");
+                System.out.println("Count is : " + parsedData.getAllDeaths() + "\n");
             }
+        } else if (cmd.getOptions().length == 0) {
 
+            File help = new File("./HELP.txt");
+            try {
+                FileInputStream fis = new FileInputStream(help.getPath());
+                byte[] helpBuffer = new byte[8000];
+                while (fis.read() != -1) {
+                    helpBuffer = fis.readAllBytes();
+                }
 
+                for (byte a : helpBuffer
+                ) {
+                    System.out.print((char) a);
+                }
 
+                System.out.println("\n");
+                fis.close();
 
-        }
-        if (cmd.hasOption("b")) {
-            if (!(cmd.hasOption("p"))) {
-
-                System.out.println("Cant backup data without parsing file!");
-
-            } else {
-
-                String[] valuesPars = cmd.getOptionValues("p");
-
-                Reader reader = new Reader(valuesPars[0], valuesPars[1]);
-                List<String[]> data = reader.readFile();
-
-                Parser parser = new Parser(data);
-                ParsedData parsedData = parser.calculateAllDeaths();
-
-                parsedData.backupData();
-                System.out.println("Data backuped!");
+            } catch (FileNotFoundException e) {
+                System.out.println("Help file not found.");
+            } catch (IOException e) {
+                System.out.println("IO exception!");
             }
 
         }
-        if (cmd.getOptions().length == 0) {
-
-            System.err.println("     Possible commands : ");
-            PrintWriter pw = new PrintWriter(System.err);
-            formatter.printOptions(pw, 150, options, 5, 10);
 
 
-            pw.flush();
-            pw.close();
 
 
-        }
     }
+
 }
 
-//        boolean con = true;
-//
-//        while (con) {
-//
-//
-//            BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-//            String options;
-//
-//            options = in.readLine();
-//
-//
-//            switch (options) {
-//                case "help":
-//                case "-h":
-//                case "?":
-//                    System.out.println("Type:\n" +
-//                            "'-d' to download file.\n" +
-//                            "'exit' to exit from programm.\n");
-//                    break;
-//
-//                case "-d":
-//                    Downloader downloader = new Downloader();
-//                    downloader.setFileUrl(prop.getProperty("fileUrl"));
-//                    downloader.setSaveDir(prop.getProperty("saveDir"));
-//                    downloader.downloadFile();
-//                    break;
-//
-//                case "-p":
-//                    String filePath = prop.getProperty("filePath");
-//
-//                    Reader fileReader = new Reader(filePath);
-//
-//                    List<String[]> arrayList = fileReader.readFile();
-//
-//                    Parser parser = new Parser(arrayList);
-//
-//                    ParsedData parsedData = parser.calculateAllDeaths();
-//                    Integer allDeaths = parsedData.getAllDeaths();
-//                    System.out.println("Deaths count is :" + allDeaths);
-//                    break;
-//
-//                case "exit":
-//                    con = false;
-//            }
-//
-//
-//        }
+
+// ===========================================================================
 
 
 
