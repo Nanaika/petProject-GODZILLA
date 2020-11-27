@@ -7,7 +7,7 @@ import java.util.Date;
 
 public class ParsedData {
 
-    private Long allDeaths;
+    private Long count;
     private String backupPath = "";
 
 
@@ -15,18 +15,18 @@ public class ParsedData {
         this.backupPath = backupPath;
     }
 
-    protected void setAllDeaths(Long deaths) {
-        this.allDeaths = deaths;
+    protected void setCount(Long count) {
+        this.count = count;
     }
 
-    public Long getAllDeaths() {
-        return this.allDeaths;
+    public Long getCount() {
+        return this.count;
     }
 
 
     public void backupData() {
 
-        Long data = this.allDeaths;
+        Long data = this.count;
 
         Date date = new Date();
         SimpleDateFormat format = new SimpleDateFormat("hh.mm-dd.MM.yyyy");

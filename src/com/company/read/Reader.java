@@ -13,8 +13,8 @@ import java.util.List;
 
 public class Reader {
 
-    private String filePath;
-    private String separator = "";
+    private String filePath = "";
+    private String separator = ",";
 
     public void setSeparator(String separator) {
         this.separator = separator;
@@ -33,7 +33,7 @@ public class Reader {
         try {
 
             if (separator == null) {
-                separator = "";
+                separator = ",";
             }
 
             if (!(separator.equals(""))) {
@@ -72,6 +72,7 @@ public class Reader {
         } catch (IOException e) {
             System.out.println("Something go wrong!" +
                     "Check folder or disk access.");
+            System.exit(0);
 
         } catch (CsvException e) {
             System.out.println("CSV exception!");

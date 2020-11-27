@@ -4,7 +4,7 @@ import java.util.List;
 
 public class Parser {
 
-    private String keyword = "total_deaths";
+    private String keyword = "new_deaths";
     private List<String[]> stringData;
 
     public void setKeyword(String keyword) {
@@ -17,19 +17,23 @@ public class Parser {
     }
 
 
-    public ParsedData calculateAllDeaths() {
+    public ParsedData calculate() {
 
         String[] heading = stringData.get(0);
 
+        for (int i = 0; i < heading.length; i++) {
+
+            heading[i] = heading[i].trim();
+
+        }
 
         int index = 0;
-        Long deaths = 0L;
+        long deaths = 0L;
 
 
         for (int i = 0; i < heading.length; i++) {
 
-            if (heading[i].equalsIgnoreCase(keyword) ||
-                    heading[i].equalsIgnoreCase(keyword + "s")) {
+            if (heading[i].equalsIgnoreCase(keyword)) {
                 index = i;
             }
 
@@ -37,14 +41,14 @@ public class Parser {
 
         if (!(heading[index].equalsIgnoreCase(keyword))
         ) {
-            if (!(heading[index].equalsIgnoreCase(keyword + "s"))) {
+
 
                 System.out.println("Keyword not found.\n" +
                         "Or wrong separator!\n" +
                         "Check file.");
 
                 System.exit(0);
-            }
+
 
         }
 
@@ -57,12 +61,12 @@ public class Parser {
             }
 
             double d = Double.parseDouble(temp);
-            Long a = (long) d;
+            long a = (long) d;
             deaths += a;
         }
 
         ParsedData parsedData = new ParsedData();
-        parsedData.setAllDeaths(deaths);
+        parsedData.setCount(deaths);
         return parsedData;
 
     }

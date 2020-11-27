@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Objects;
 
 public class Downloader {
 
@@ -20,7 +21,9 @@ public class Downloader {
         return fileName;
     }
 
-
+    public String getFileUrl() {
+        return fileUrl;
+    }
 
     public void setFileUrl(String url) {
         this.fileUrl = url;
@@ -34,12 +37,34 @@ public class Downloader {
         return this.saveDir;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Downloader that = (Downloader) o;
+        return fileUrl.equals(that.fileUrl) &&
+                saveDir.equals(that.saveDir) &&
+                fileName.equals(that.fileName) &&
+                saveFilePath.equals(that.saveFilePath);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fileUrl, saveDir, fileName, saveFilePath);
+    }
+
     public void downloadFile() {
 
 
-         fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
-         saveFilePath = saveDir + File.separator + fileName;
+        fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+        if (saveDir.charAt(saveDir.length() - 1) == '/') {
 
+            saveFilePath = saveDir + fileName;
+        } else {
+
+            saveFilePath = saveDir + File.separator + fileName;
+
+        }
 
         URL url = null;
         try {
@@ -84,6 +109,7 @@ public class Downloader {
                     "1.File not available for download!" +
                     "Check url!\n" +
                     "2.Check folder or disk access!\n");
+            System.exit(0);
 
         }
 
