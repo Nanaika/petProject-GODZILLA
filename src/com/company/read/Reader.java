@@ -13,56 +13,26 @@ import java.util.List;
 
 public class Reader {
 
-    private String filePath = "";
-    private String separator = ",";
-
-    public void setSeparator(String separator) {
-        this.separator = separator;
-    }
 
 
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
-    }
 
+    public List<String[]> readFile(String filePath, String separator) {
 
-    public List<String[]> readFile() {
+        char sep = separator.charAt(0);
 
         List<String[]> arrayList = null;
+        CSVReader csvReader;
 
         try {
+            CSVParserBuilder csvParserBuilder = new CSVParserBuilder();
+            csvParserBuilder.withSeparator(sep);
+            CSVParser csvParser = csvParserBuilder.build();
+            CSVReaderBuilder csvReaderBuilder = new CSVReaderBuilder(new FileReader(filePath));
+            csvReaderBuilder.withCSVParser(csvParser);
+            csvReader = csvReaderBuilder.build();
+            arrayList = csvReader.readAll();
+            csvReader.close();
 
-            if (separator == null) {
-                separator = ",";
-            }
-
-            if (!(separator.equals(""))) {
-                char sep = separator.charAt(0);
-
-
-                CSVParserBuilder csvParser = new CSVParserBuilder();
-                csvParser.withSeparator(sep);
-
-                CSVParser csvParser1 = csvParser.build();
-
-                CSVReaderBuilder csvReaderBuilder = new CSVReaderBuilder(new FileReader(filePath));
-
-                csvReaderBuilder.withCSVParser(csvParser1);
-
-                CSVReader csvReader = csvReaderBuilder.build();
-
-
-                arrayList = csvReader.readAll();
-
-                csvReader.close();
-
-            } else {
-
-                CSVReader csvReader = new CSVReader(new FileReader(filePath));
-                arrayList = csvReader.readAll();
-
-                csvReader.close();
-            }
 
         } catch (FileNotFoundException e) {
             System.out.println("Sorry!" +
@@ -73,7 +43,35 @@ public class Reader {
             System.out.println("Something go wrong!" +
                     "Check folder or disk access.");
             System.exit(0);
+        } catch (CsvException e) {
+            System.out.println("CSV exception!");
+        }
 
+
+        return arrayList;
+    }
+
+
+    public List<String[]> readFile(String filePath) {
+
+        List<String[]> arrayList = null;
+        CSVReader csvReader;
+
+        try {
+            csvReader = new CSVReader(new FileReader(filePath));
+            arrayList = csvReader.readAll();
+            csvReader.close();
+
+
+        } catch (FileNotFoundException e) {
+            System.out.println("Sorry!" +
+                    "File not found!" +
+                    "Check file path" +
+                    " or change file path to valid!");
+        } catch (IOException e) {
+            System.out.println("Something go wrong!" +
+                    "Check folder or disk access.");
+            System.exit(0);
         } catch (CsvException e) {
             System.out.println("CSV exception!");
         }

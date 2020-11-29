@@ -87,6 +87,14 @@ public class Main {
         }
 
 
+        String url = cmd.getOptionValue("d");
+        String saveDir = cmd.getOptionValue("o");
+        String sep = cmd.getOptionValue("sep");
+        String pathFromP = cmd.getOptionValue("p");
+        String keyword = cmd.getOptionValue("kw");
+        String backupPath = cmd.getOptionValue("b");
+        String pathFromV = cmd.getOptionValue("v");
+
         if (cmd.hasOption("v")) {
             if (cmd.hasOption("kw")) {
                 if (cmd.hasOption("kc")) {
@@ -95,17 +103,15 @@ public class Main {
 
                         vis.setKeyWord(cmd.getOptionValue("kw"));
                         vis.setKeyCountry(cmd.getOptionValue("kc"));
-                        vis.setFilePath(cmd.getOptionValue("v"));
                         vis.setKeyYearMonth(cmd.getOptionValue("km"));
-                        vis.saveChart(vis.createDataSet(), vis.getKeyYearMonth());
+                        vis.saveChart(vis.createDataSet(pathFromV), vis.getKeyYearMonth());
 
                     } else {
 
                         Visualization vis = new Visualization();
                         vis.setKeyWord(cmd.getOptionValue("kw"));
                         vis.setKeyCountry(cmd.getOptionValue("kc"));
-                        vis.setFilePath(cmd.getOptionValue("v"));
-                        vis.createAndSaveYearByMonths();
+                        vis.createAndSaveYearByMonths(pathFromV);
 
                     }
                 }
@@ -114,231 +120,116 @@ public class Main {
         }
 
 
-        if (cmd.hasOption("d") && cmd.hasOption("o")) {
+        if (cmd.hasOption("d") && cmd.hasOption("o") &&
+                cmd.getOptions().length == 2) {
 
             Downloader downloader = new Downloader();
 
-            downloader.setFileUrl(cmd.getOptionValue("d"));
-            downloader.setSaveDir(cmd.getOptionValue("o"));
-            downloader.downloadFile();
+            downloader.downloadFile(url, saveDir);
 
-        } else if (cmd.hasOption("d") && cmd.hasOption("o")
-                && cmd.hasOption("p")) {
 
-            Downloader downloader = new Downloader();
-
-            downloader.setFileUrl(cmd.getOptionValue("d"));
-            downloader.setSaveDir(cmd.getOptionValue("o"));
-            downloader.downloadFile();
-
-            String filename = downloader.getFileName();
-
-            String path = cmd.getOptionValue("o");
-
-            Reader reader = new Reader();
-            reader.setFilePath(path + File.separator + filename);
-            List<String[]> data = reader.readFile();
-
-            Parser parser = new Parser(data);
-            ParsedData parsedData = parser.calculate();
-            System.out.println("File parsed\n");
-            System.out.println("Count is : " + parsedData.getCount() + "\n");
-
-        } else if (cmd.hasOption("d") && cmd.hasOption("o")
+        }
+        if (cmd.hasOption("d") && cmd.hasOption("o")
                 && cmd.hasOption("p") && cmd.hasOption("kw")) {
 
             Downloader downloader = new Downloader();
 
-            downloader.setFileUrl(cmd.getOptionValue("d"));
-            downloader.setSaveDir(cmd.getOptionValue("o"));
-            downloader.downloadFile();
+            downloader.downloadFile(url, saveDir);
 
-            String filename = downloader.getFileName();
-
-            String path = cmd.getOptionValue("o");
+            String filename = downloader.extractName(url);
+            String pathToFile = saveDir + File.separator + filename;
 
             Reader reader = new Reader();
-            reader.setFilePath(path + File.separator + filename);
-            List<String[]> data = reader.readFile();
+            List<String[]> data = reader.readFile(pathToFile);
 
-            Parser parser = new Parser(data);
-            parser.setKeyword(cmd.getOptionValue("kw"));
-            ParsedData parsedData = parser.calculate();
+            Parser parser = new Parser();
+            ParsedData parsedData = parser.calculate(data, keyword);
             System.out.println("File parsed\n");
             System.out.println("Count is : " + parsedData.getCount() + "\n");
 
 
-        } else if (cmd.hasOption("d") && cmd.hasOption("o")
-                && cmd.hasOption("p") && cmd.hasOption("sep")) {
-
-            Downloader downloader = new Downloader();
-
-            downloader.setFileUrl(cmd.getOptionValue("d"));
-            downloader.setSaveDir(cmd.getOptionValue("o"));
-            downloader.downloadFile();
-
-            String filename = downloader.getFileName();
-
-            String path = cmd.getOptionValue("o");
-
-            Reader reader = new Reader();
-            reader.setSeparator(cmd.getOptionValue("sep"));
-            reader.setFilePath(path + File.separator + filename);
-            List<String[]> data = reader.readFile();
-
-            Parser parser = new Parser(data);
-            ParsedData parsedData = parser.calculate();
-            System.out.println("File parsed\n");
-            System.out.println("Count is : " + parsedData.getCount() + "\n");
+        }
 
 
-        } else if (cmd.hasOption("d") && cmd.hasOption("o")
-                && cmd.hasOption("p") && cmd.hasOption("kw")
-                && cmd.hasOption("sep")) {
-
-            Downloader downloader = new Downloader();
-
-            downloader.setFileUrl(cmd.getOptionValue("d"));
-            downloader.setSaveDir(cmd.getOptionValue("o"));
-            downloader.downloadFile();
-
-            String filename = downloader.getFileName();
-
-            String path = cmd.getOptionValue("o");
-
-            Reader reader = new Reader();
-            reader.setSeparator(cmd.getOptionValue("sep"));
-            reader.setFilePath(path + File.separator + filename);
-            List<String[]> data = reader.readFile();
-
-            Parser parser = new Parser(data);
-            parser.setKeyword(cmd.getOptionValue("kw"));
-            ParsedData parsedData = parser.calculate();
-            System.out.println("File parsed\n");
-            System.out.println("Count is : " + parsedData.getCount() + "\n");
-
-
-        } else if (cmd.hasOption("d") && cmd.hasOption("o")
-                && cmd.hasOption("p") && cmd.hasOption("kw")
-                && cmd.hasOption("sep")
-                && cmd.hasOption("b")) {
-
-            Downloader downloader = new Downloader();
-
-            downloader.setFileUrl(cmd.getOptionValue("d"));
-            downloader.setSaveDir(cmd.getOptionValue("o"));
-            downloader.downloadFile();
-
-            String filename = downloader.getFileName();
-
-            String path = cmd.getOptionValue("o");
-
-            Reader reader = new Reader();
-            reader.setSeparator(cmd.getOptionValue("sep"));
-            reader.setFilePath(path + File.separator + filename);
-            List<String[]> data = reader.readFile();
-
-            Parser parser = new Parser(data);
-            parser.setKeyword(cmd.getOptionValue("kw"));
-            ParsedData parsedData = parser.calculate();
-            System.out.println("File parsed\n");
-            System.out.println("Count is : " + parsedData.getCount() + "\n");
-
-            parsedData.setBackupPath(cmd.getOptionValue("b"));
-
-            parsedData.backupData();
-            System.out.println("Data backuped!");
-        } else if (cmd.hasOption("d") && cmd.hasOption("o")
+        if (cmd.hasOption("d") && cmd.hasOption("o")
                 && cmd.hasOption("p") && cmd.hasOption("kw")
                 && cmd.hasOption("b")) {
 
             Downloader downloader = new Downloader();
 
-            downloader.setFileUrl(cmd.getOptionValue("d"));
-            downloader.setSaveDir(cmd.getOptionValue("o"));
-            downloader.downloadFile();
+            downloader.downloadFile(url, saveDir);
 
-            String filename = downloader.getFileName();
-
-            String path = cmd.getOptionValue("o");
+            String filename = downloader.extractName(url);
+            String pathToFile = saveDir + File.separator + filename;
 
             Reader reader = new Reader();
-            reader.setFilePath(path + File.separator + filename);
-            List<String[]> data = reader.readFile();
+            List<String[]> data = reader.readFile(pathToFile);
 
-            Parser parser = new Parser(data);
-            parser.setKeyword(cmd.getOptionValue("kw"));
-            ParsedData parsedData = parser.calculate();
+            Parser parser = new Parser();
+            ParsedData parsedData = parser.calculate(data, keyword);
             System.out.println("File parsed\n");
             System.out.println("Count is : " + parsedData.getCount() + "\n");
 
-            parsedData.setBackupPath(cmd.getOptionValue("b"));
-
-            parsedData.backupData();
+            parsedData.backupData(backupPath);
             System.out.println("Data backuped!");
-        } else if (cmd.hasOption("d") && cmd.hasOption("o")
-                && cmd.hasOption("p") && cmd.hasOption("sep")
+
+        }
+        if (cmd.hasOption("d") && cmd.hasOption("o")
+                && cmd.hasOption("p") && cmd.hasOption("kw")
                 && cmd.hasOption("b")) {
 
             Downloader downloader = new Downloader();
 
-            downloader.setFileUrl(cmd.getOptionValue("d"));
-            downloader.setSaveDir(cmd.getOptionValue("o"));
-            downloader.downloadFile();
+            downloader.downloadFile(url, saveDir);
 
-            String filename = downloader.getFileName();
-
-            String path = cmd.getOptionValue("o");
+            String filename = downloader.extractName(url);
+            String pathToFile = saveDir + File.separator + filename;
 
             Reader reader = new Reader();
-            reader.setSeparator(cmd.getOptionValue("sep"));
-            reader.setFilePath(path + File.separator + filename);
-            List<String[]> data = reader.readFile();
+            List<String[]> data = reader.readFile(pathToFile);
 
-            Parser parser = new Parser(data);
-            ParsedData parsedData = parser.calculate();
+            Parser parser = new Parser();
+            ParsedData parsedData = parser.calculate(data, keyword);
             System.out.println("File parsed\n");
             System.out.println("Count is : " + parsedData.getCount() + "\n");
 
-            parsedData.setBackupPath(cmd.getOptionValue("b"));
-
-            parsedData.backupData();
+            parsedData.backupData(backupPath);
             System.out.println("Data backuped!");
 
-        } else if (cmd.hasOption("p")) {
+        }
+        if (cmd.hasOption("d") && cmd.hasOption("o")
+                && cmd.hasOption("p") &&
+                cmd.hasOption("b")) {
+
+            Downloader downloader = new Downloader();
+
+            downloader.downloadFile(url, saveDir);
+
+            String filename = downloader.extractName(url);
+            String pathToFile = saveDir + File.separator + filename;
 
             Reader reader = new Reader();
-            reader.setFilePath(cmd.getOptionValue("p"));
-            List<String[]> data = reader.readFile();
+            List<String[]> data = reader.readFile(pathToFile, sep);
 
-            Parser parser = new Parser(data);
-            ParsedData parsedData = parser.calculate();
+            Parser parser = new Parser();
+            ParsedData parsedData = parser.calculate(data, keyword);
             System.out.println("File parsed\n");
             System.out.println("Count is : " + parsedData.getCount() + "\n");
 
-        } else if (cmd.hasOption("p") &&
-                cmd.hasOption("sep")) {
+            parsedData.backupData(backupPath);
+            System.out.println("Data backuped!");
+
+
+        }
+        if (cmd.hasOption("p") &&
+                cmd.hasOption("kw") &&
+                cmd.getOptions().length == 0) {
 
             Reader reader = new Reader();
-            reader.setSeparator("sep");
-            reader.setFilePath(cmd.getOptionValue("p"));
-            List<String[]> data = reader.readFile();
+            List<String[]> data = reader.readFile(pathFromP);
 
-            Parser parser = new Parser(data);
-            ParsedData parsedData = parser.calculate();
-            System.out.println("File parsed\n");
-            System.out.println("Count is : " + parsedData.getCount() + "\n");
-
-        } else if (cmd.hasOption("p") &&
-                cmd.hasOption("kw")) {
-
-            Reader reader = new Reader();
-            reader.setFilePath(cmd.getOptionValue("p"));
-            List<String[]> data = reader.readFile();
-
-            Parser parser = new Parser(data);
-            parser.setKeyword(cmd.getOptionValue("kw"));
-            ParsedData parsedData = parser.calculate();
+            Parser parser = new Parser();
+            ParsedData parsedData = parser.calculate(data, keyword);
             System.out.println("File parsed\n");
             System.out.println("Count is : " + parsedData.getCount() + "\n");
 
@@ -347,93 +238,50 @@ public class Main {
                 && cmd.hasOption("sep")) {
 
             Reader reader = new Reader();
-            reader.setSeparator(cmd.getOptionValue("sep"));
-            reader.setFilePath(cmd.getOptionValue("p"));
-            List<String[]> data = reader.readFile();
+            List<String[]> data = reader.readFile(pathFromP, sep);
 
-            Parser parser = new Parser(data);
-            parser.setKeyword(cmd.getOptionValue("kw"));
-            ParsedData parsedData = parser.calculate();
+            Parser parser = new Parser();
+            ParsedData parsedData = parser.calculate(data, keyword);
             System.out.println("File parsed\n");
             System.out.println("Count is : " + parsedData.getCount() + "\n");
 
-        } else if (cmd.hasOption("p") && cmd.hasOption("b")) {
 
-            Reader reader = new Reader();
-            reader.setFilePath(cmd.getOptionValue("p"));
-            List<String[]> data = reader.readFile();
-
-            Parser parser = new Parser(data);
-            ParsedData parsedData = parser.calculate();
-            System.out.println("File parsed\n");
-            System.out.println("Count is : " + parsedData.getCount() + "\n");
-
-            parsedData.setBackupPath(cmd.getOptionValue("b"));
-
-            parsedData.backupData();
-            System.out.println("Data backuped!");
-
-        } else if (cmd.hasOption("p") &&
-                cmd.hasOption("sep") &&
-                cmd.hasOption("b")) {
-
-            Reader reader = new Reader();
-            reader.setSeparator("sep");
-            reader.setFilePath(cmd.getOptionValue("p"));
-            List<String[]> data = reader.readFile();
-
-            Parser parser = new Parser(data);
-            ParsedData parsedData = parser.calculate();
-            System.out.println("File parsed\n");
-            System.out.println("Count is : " + parsedData.getCount() + "\n");
-
-            parsedData.setBackupPath(cmd.getOptionValue("b"));
-
-            parsedData.backupData();
-            System.out.println("Data backuped!");
-
-        } else if (cmd.hasOption("p") &&
+        }
+        if (cmd.hasOption("p") &&
                 cmd.hasOption("kw") &&
                 cmd.hasOption("b")) {
 
             Reader reader = new Reader();
-            reader.setFilePath(cmd.getOptionValue("p"));
-            List<String[]> data = reader.readFile();
+            List<String[]> data = reader.readFile(pathFromP);
 
-            Parser parser = new Parser(data);
-            parser.setKeyword(cmd.getOptionValue("kw"));
-            ParsedData parsedData = parser.calculate();
+            Parser parser = new Parser();
+            ParsedData parsedData = parser.calculate(data, keyword);
             System.out.println("File parsed\n");
             System.out.println("Count is : " + parsedData.getCount() + "\n");
 
-            parsedData.setBackupPath(cmd.getOptionValue("b"));
 
-            parsedData.backupData();
+            parsedData.backupData(backupPath);
             System.out.println("Data backuped!");
 
-        } else if (cmd.hasOption("p") &&
+        }
+        if (cmd.hasOption("p") &&
                 cmd.hasOption("kw")
                 && cmd.hasOption("sep") &&
                 cmd.hasOption("b")) {
 
             Reader reader = new Reader();
-            reader.setSeparator(cmd.getOptionValue("sep"));
-            reader.setFilePath(cmd.getOptionValue("p"));
-            List<String[]> data = reader.readFile();
+            List<String[]> data = reader.readFile(pathFromP, sep);
 
-            Parser parser = new Parser(data);
-            parser.setKeyword(cmd.getOptionValue("kw"));
-            ParsedData parsedData = parser.calculate();
+            Parser parser = new Parser();
+            ParsedData parsedData = parser.calculate(data, keyword);
             System.out.println("File parsed\n");
             System.out.println("Count is : " + parsedData.getCount() + "\n");
 
-            parsedData.setBackupPath(cmd.getOptionValue("b"));
 
-            parsedData.backupData();
+            parsedData.backupData(backupPath);
             System.out.println("Data backuped!");
 
         }
-
 
 
         if (cmd.getOptions().length == 0) {
@@ -450,172 +298,6 @@ public class Main {
 
         }
     }
-
-
-//        if (cmd.hasOption("d")) {
-//            if (cmd.hasOption("o")) {
-//                if (cmd.hasOption("p")) {
-//                    if (cmd.hasOption("kw")) {
-//                        if (cmd.hasOption("sep")) {
-//                            if (cmd.hasOption("b")) {
-//                                Downloader downloader = new Downloader();
-//
-//                                downloader.setFileUrl(cmd.getOptionValue("d"));
-//                                downloader.setSaveDir(cmd.getOptionValue("o"));
-//                                downloader.downloadFile();
-//
-//                                String filename = downloader.getFileName();
-//
-//                                String path = cmd.getOptionValue("o");
-//                                String sep = cmd.getOptionValue("sep");
-//
-//                                Reader reader = new Reader();
-//                                reader.setFilePath(path + File.separator + filename);
-//                                reader.setSeparator(sep);
-//                                List<String[]> data = reader.readFile();
-//
-//                                Parser parser = new Parser(data);
-//                                ParsedData parsedData = parser.calculateAllDeaths();
-//                                System.out.println("File parsed\n");
-//                                System.out.println("Count is : " + parsedData.getCount() + "\n");
-//
-//                                parsedData.setBackupPath(cmd.getOptionValue("b"));
-//
-//                                parsedData.backupData();
-//                                System.out.println("Data backuped!");
-//                            } else {
-//                                Downloader downloader = new Downloader();
-//
-//                                downloader.setFileUrl(cmd.getOptionValue("d"));
-//                                downloader.setSaveDir(cmd.getOptionValue("o"));
-//                                downloader.downloadFile();
-//
-//                                String filename = downloader.getFileName();
-//
-//                                String path = cmd.getOptionValue("o");
-//                                String sep = cmd.getOptionValue("sep");
-//
-//                                Reader reader = new Reader();
-//                                reader.setFilePath(path + File.separator + filename);
-//                                reader.setSeparator(sep);
-//                                List<String[]> data = reader.readFile();
-//
-//                                Parser parser = new Parser(data);
-//                                ParsedData parsedData = parser.calculateAllDeaths();
-//                                System.out.println("File parsed\n");
-//                                System.out.println("Count is : " + parsedData.getCount() + "\n");
-//                            }
-//                        } else {
-//                            Downloader downloader = new Downloader();
-//
-//                            downloader.setFileUrl(cmd.getOptionValue("d"));
-//                            downloader.setSaveDir(cmd.getOptionValue("o"));
-//                            downloader.downloadFile();
-//
-//                            String filename = downloader.getFileName();
-//
-//                            String path = cmd.getOptionValue("o");
-//
-//                            Reader reader = new Reader();
-//                            reader.setFilePath(path + File.separator + filename);
-//                            List<String[]> data = reader.readFile();
-//
-//                            Parser parser = new Parser(data);
-//                            ParsedData parsedData = parser.calculateAllDeaths();
-//                            System.out.println("File parsed\n");
-//                            System.out.println("Count is : " + parsedData.getCount() + "\n");
-//
-//                            parsedData.setBackupPath(cmd.getOptionValue("b"));
-//
-//                            parsedData.backupData();
-//                            System.out.println("Data backuped!");
-//                        }
-//                    } else {
-//
-//
-//                    }
-//                } else {
-//                    Downloader downloader = new Downloader();
-//
-//                    downloader.setFileUrl(cmd.getOptionValue("d"));
-//                    downloader.setSaveDir(cmd.getOptionValue("o"));
-//                    downloader.downloadFile();
-//                }
-//            } else {
-//                System.out.println("Enter command -o for output path");
-//            }
-//        } else if (cmd.hasOption("p")) {
-//            if (cmd.hasOption("sep") || !(cmd.hasOption("sep"))) {
-//                if (cmd.hasOption("b")) {
-//                    String path = cmd.getOptionValue("p");
-//                    String sep = cmd.getOptionValue("sep");
-//
-//                    if (cmd.getOptionValue("p") == null) {
-//
-//                        System.out.println("Enter path to file for command -p!");
-//                        System.exit(0);
-//                    }
-//
-//                    Reader reader = new Reader();
-//                    reader.setFilePath(path);
-//                    reader.setSeparator(sep);
-//                    List<String[]> data = reader.readFile();
-//
-//                    Parser parser = new Parser(data);
-//                    ParsedData parsedData = parser.calculateAllDeaths();
-//                    System.out.println("File parsed\n");
-//                    System.out.println("Count is : " + parsedData.getCount() + "\n");
-//                    parsedData.setBackupPath(cmd.getOptionValue("b"));
-//
-//                    parsedData.backupData();
-//                    System.out.println("Data backuped!");
-//                } else {
-//                    String path = cmd.getOptionValue("p");
-//                    String sep = cmd.getOptionValue("sep");
-//
-//                    if (cmd.getOptionValue("p") == null) {
-//
-//                        System.out.println("Enter path to file for command -p!");
-//                        System.exit(0);
-//                    }
-//
-//
-//                    Reader reader = new Reader();
-//                    reader.setFilePath(path);
-//                    reader.setSeparator(sep);
-//                    List<String[]> data = reader.readFile();
-//
-//                    Parser parser = new Parser(data);
-//                    ParsedData parsedData = parser.calculateAllDeaths();
-//                    System.out.println("File parsed\n");
-//                    System.out.println("Count is : " + parsedData.getCount() + "\n");
-//
-//                }
-//            } else {
-//                String path = cmd.getOptionValue("p");
-//
-//                Reader reader = new Reader();
-//                reader.setFilePath(path);
-//                List<String[]> data = reader.readFile();
-//
-//                Parser parser = new Parser(data);
-//                ParsedData parsedData = parser.calculateAllDeaths();
-//                System.out.println("File parsed\n");
-//                System.out.println("Count is : " + parsedData.getCount() + "\n");
-//            }
-//        } else if (cmd.getOptions().length == 0) {
-//
-//
-//            System.out.println("-d <url> -o <path> -p[path] -sep<\" \"> -b<path>\n");
-//
-//            PrintWriter pw = new PrintWriter(System.out);
-//            help.printOptions(pw, 150, options, 5, 10);
-//
-//
-//            pw.flush();
-//            pw.close();
-//
-//        }
 
 
 }

@@ -4,31 +4,26 @@ import java.util.List;
 
 public class Parser {
 
-    private String keyword = "new_deaths";
-    private List<String[]> stringData;
 
-    public void setKeyword(String keyword) {
-        this.keyword = keyword;
-    }
+    private String[] checkHeading(List<String[]> data) {
 
-    public Parser(List<String[]> stringData) {
-        this.stringData = stringData;
-
-    }
-
-
-    public ParsedData calculate() {
-
-        String[] heading = stringData.get(0);
+        String[] heading = data.get(0);
 
         for (int i = 0; i < heading.length; i++) {
 
             heading[i] = heading[i].trim();
 
         }
+        return heading;
+    }
+
+
+    public ParsedData calculate(List<String[]> data, String keyword) {
+
+        String[] heading = checkHeading(data);
 
         int index = 0;
-        long deaths = 0L;
+        long countKeyword = 0L;
 
 
         for (int i = 0; i < heading.length; i++) {
@@ -43,30 +38,30 @@ public class Parser {
         ) {
 
 
-                System.out.println("Keyword not found.\n" +
-                        "Or wrong separator!\n" +
-                        "Check file.");
+            System.out.println("Keyword not found.\n" +
+                    "Or wrong separator!\n" +
+                    "Check file.");
 
-                System.exit(0);
+            System.exit(0);
 
 
         }
 
 
-        for (int x = 1; x < stringData.size(); x++) {
+        for (int x = 1; x < data.size(); x++) {
 
-            String temp = stringData.get(x)[index];
+            String temp = data.get(x)[index];
             if (temp.equals("")) {
                 continue;
             }
 
             double d = Double.parseDouble(temp);
             long a = (long) d;
-            deaths += a;
+            countKeyword += a;
         }
 
         ParsedData parsedData = new ParsedData();
-        parsedData.setCount(deaths);
+        parsedData.setCount(countKeyword);
         return parsedData;
 
     }

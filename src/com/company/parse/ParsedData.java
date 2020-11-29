@@ -8,12 +8,8 @@ import java.util.Date;
 public class ParsedData {
 
     private Long count;
-    private String backupPath = "";
 
 
-    public void setBackupPath(String backupPath) {
-        this.backupPath = backupPath;
-    }
 
     protected void setCount(Long count) {
         this.count = count;
@@ -24,7 +20,7 @@ public class ParsedData {
     }
 
 
-    public void backupData() {
+    public void backupData(String backupPath) {
 
         Long data = this.count;
 

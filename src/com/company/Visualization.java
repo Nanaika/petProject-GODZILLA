@@ -11,22 +11,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-public class Visualization  {
+public class Visualization {
 
-    private String filepath = "";
     private String keyWord = "";
     private String keyCountry = "";
     private String keyYearMonth = "";
 
 
 
-    public void setFilePath(String path) {
-        this.filepath = path;
-    }
-
-    public String getFilePath() {
-        return this.filepath;
-    }
 
 
     public String getKeyWord() {
@@ -55,12 +47,11 @@ public class Visualization  {
     }
 
 
-    public DefaultCategoryDataset createDataSet() {
+    public DefaultCategoryDataset createDataSet(String path) {
 
         Reader reader = new Reader();
-        reader.setFilePath(getFilePath());
 
-        List<String[]> data = reader.readFile();
+        List<String[]> data = reader.readFile(path);
 
         String[] heading = data.get(0);
 
@@ -133,12 +124,6 @@ public class Visualization  {
                 PlotOrientation.VERTICAL,
                 true, true, false);
 
-
-
-
-
-
-
         File file = new File(id + "Deaths " + ".png");
         try {
             ChartUtilities.saveChartAsPNG(file, chart, 1366, 768);
@@ -151,16 +136,14 @@ public class Visualization  {
     }
 
 
-
-
-    public void createAndSaveYearByMonths() {
+    public void createAndSaveYearByMonths(String path) {
 
         Reader reader = new Reader();
-        reader.setFilePath(getFilePath());
 
-        List<String[]> data = reader.readFile();
+        List<String[]> data = reader.readFile(path);
 
         String[] heading = data.get(0);
+
 
 
         for (int i = 0; i < heading.length; i++) {

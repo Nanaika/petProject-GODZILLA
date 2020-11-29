@@ -7,69 +7,45 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Objects;
 
 public class Downloader {
 
-    private String fileUrl = "";
-    private String saveDir = "";
-    private String fileName;
-    private String saveFilePath;
+    public String extractName(String url) {
 
+        return url.substring(url.lastIndexOf("/") + 1);
 
-    public String getFileName() {
-        return fileName;
     }
 
-    public String getFileUrl() {
-        return fileUrl;
-    }
+    public String createSavePath(String url, String saveDir) {
 
-    public void setFileUrl(String url) {
-        this.fileUrl = url;
-    }
+        String fileName = extractName(url);
+        String saveFilePath;
 
-    public void setSaveDir(String path) {
-        this.saveDir = path;
-    }
-
-    public String getSaveDir() {
-        return this.saveDir;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Downloader that = (Downloader) o;
-        return fileUrl.equals(that.fileUrl) &&
-                saveDir.equals(that.saveDir) &&
-                fileName.equals(that.fileName) &&
-                saveFilePath.equals(that.saveFilePath);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(fileUrl, saveDir, fileName, saveFilePath);
-    }
-
-    public void downloadFile() {
-
-
-        fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
         if (saveDir.charAt(saveDir.length() - 1) == '/') {
 
             saveFilePath = saveDir + fileName;
+
         } else {
 
             saveFilePath = saveDir + File.separator + fileName;
 
         }
 
-        URL url = null;
+        return saveFilePath;
+
+    }
+
+
+    public void downloadFile(String url, String saveDir) {
+
+
+        String saveFilePath = createSavePath(url, saveDir);
+
+
+        URL urlObj = null;
         try {
 
-            url = new URL(fileUrl);
+            urlObj = new URL(url);
 
         } catch (MalformedURLException e) {
 
@@ -79,8 +55,8 @@ public class Downloader {
         HttpURLConnection httpCon = null;
         try {
 
-            assert url != null;
-            httpCon = (HttpURLConnection) url.openConnection();
+            assert urlObj != null;
+            httpCon = (HttpURLConnection) urlObj.openConnection();
 
         } catch (IOException e) {
 
